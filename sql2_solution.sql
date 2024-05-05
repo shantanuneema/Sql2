@@ -78,25 +78,14 @@ FROM Tree;
 
 -- Solution to Problem 4 
 WITH CTE AS (
-    SELECT 
-        e.name AS EmployeeName,
-        e.departmentId, 
-        e.salary, 
-        DENSE_RANK() OVER (PARTITION BY e.departmentId ORDER BY e.salary DESC) AS rnk
-    FROM 
-        Employee e
+    SELECT e.*, DENSE_RANK() OVER (PARTITION BY e.departmentId ORDER BY e.salary DESC) AS rnk
+    FROM Employee e
 )
 SELECT 
     d.name AS Department, 
-    c.EmployeeName AS Employee, 
+    c.name AS Employee, 
     c.salary AS Salary 
-FROM 
-    CTE c
-JOIN 
-    Department d ON c.departmentId = d.id 
-WHERE 
-    c.rnk <= 3;
+FROM CTE c JOIN Department d ON c.departmentId = d.id 
+WHERE c.rnk <= 3;
 
-SELECT DISTINCT num AS 'ConsecutiveNums'
-FROM CTE_leads
-WHERE num = lead1 AND lead1 = lead2
+
