@@ -77,16 +77,25 @@ SELECT
 FROM Tree;
 
 -- Solution to Problem 4 
-SELECT DISTINCT l1.num AS 'ConsecutiveNums'
-FROM Logs l1, Logs l2, Logs l3
-WHERE l1.id = l2.id - 1 AND l2.id = l3.id - 1
-AND l1.num = l2.num AND l2.num = l3.num
-
--- Solution to Problem 4 (Using window function)
-WITH CTE_leads AS (
-    SELECT num, LEAD(num, 1) OVER (ORDER BY id) AS lead1, LEAD(num, 2) OVER (ORDER BY id) AS lead2
-    FROM Logs
+WITH CTE AS (
+    SELECT 
+        e.name AS EmployeeName,
+        e.departmentId, 
+        e.salary, 
+        DENSE_RANK() OVER (PARTITION BY e.departmentId ORDER BY e.salary DESC) AS rnk
+    FROM 
+        Employee e
 )
+SELECT 
+    d.name AS Department, 
+    c.EmployeeName AS Employee, 
+    c.salary AS Salary 
+FROM 
+    CTE c
+JOIN 
+    Department d ON c.departmentId = d.id 
+WHERE 
+    c.rnk <= 3;
 
 SELECT DISTINCT num AS 'ConsecutiveNums'
 FROM CTE_leads
